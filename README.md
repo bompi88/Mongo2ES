@@ -36,6 +36,35 @@ docker run --name Mongo2ES -d \
 
 *note*: the docker image is also available at docker hub as an automated build. https://hub.docker.com/r/alino/mongo2es/
 
+#### Linking with MongoDB and Elasticsearch containers
+
+If containers exists for both MongoDB and Elasticsearch, with names `mongodb` and `elasticsearch` respectively, you can link the containers as follows
+
+```shell
+docker run --name Mongo2ES -d \
+  --link mongodb:db \
+  --link elasticsearch:es \
+  -e ROOT_URL=http://localhost:3001 \
+  -e MONGO_URL="mongodb://db/dbname?replicaSet=rs&readPreference=primaryPreferred&w=majority&connectTimeoutMS=60000&socketTimeoutMS=60000" \
+  -e MONGO_OPLOG_URL=mongodb://db/local \
+  -e elasticsearchHost="http://es:9200" \
+  -p 3001:80 \
+  kuknito/mongo2es
+```
+
+another approach is to not set the `elasticsearchHost` env variable at all, and/or specifying the mongo ports directly, E.g.:
+
+```shell
+docker run --name Mongo2ES -d \
+  --link mongodb:db \
+  --link elasticsearch:es \
+  -e ROOT_URL=http://localhost:3001 \
+  -e MONGO_URL="mongodb://db:27017/dbname?replicaSet=rs&readPreference=primaryPreferred&w=majority&connectTimeoutMS=60000&socketTimeoutMS=60000" \
+  -e MONGO_OPLOG_URL=mongodb://db:27017/local \
+  -p 3001:80 \
+  kuknito/mongo2es
+```
+
 ### install as a Meteor package
 ```
 meteor add alino:mongo2es
